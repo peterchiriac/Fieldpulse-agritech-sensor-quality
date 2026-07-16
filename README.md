@@ -2,20 +2,9 @@
 
 ## Overview
 
-Project FieldPulse is a PostgreSQL-based data-quality pipeline for messy farm sensor telemetry.
+Project FieldPulse is a PostgreSQL-based data-quality pipeline for unreliable farm sensor telemetry.
 
-The project simulates a small agritech sensor dataset and demonstrates how raw IoT-style field readings can be imported, validated, cleaned, flagged, and summarised while preserving the original raw data.
-
-The aim of the project is to show a practical analyst workflow:
-
-```text
-raw sensor data
-→ PostgreSQL staging table
-→ data-quality checks
-→ reusable clean view
-→ diagnostic flags
-→ final QA summary
-```
+The project demonstrates a simulated agritech dataset to show how raw IoT-style field readings can be imported, preserved, validated, cleaned, flagged, and summarised into a reusable analytical layer for safer downstream analysis.
 
 ## Problem
 
@@ -30,6 +19,63 @@ This project focuses on three common telemetry data-quality issues:
 2. Battery-related missing temperature and moisture readings
 
 3. Frozen temperature sensor behaviour caused by repeated identical values
+
+
+## Repository Structure
+
+```text
+Fieldpulse-agritech-sensor-quality/
+├── README.md
+├── requirements.txt
+├── data/
+│   └── dirty_farm_sensors.csv
+├── docs/
+│   └── investigation_notes.md
+├── outputs/
+│   ├── probe_quality_summary.csv
+│   └── qa_summary.csv
+├── scripts/
+│   └── generate_data.py
+└── sql/
+    ├── 01_create_staging.sql
+    ├── 02_load_data.sql
+    ├── 03_create_clean_view.sql
+    └── 04_qa_summary.sql
+```
+
+## Project Files
+
+| File | Purpose |
+|---|---|
+| `data/dirty_farm_sensors.csv` | Simulated farm sensor telemetry |
+| `scripts/generate_data.py` | Generates the simulated dataset |
+| `sql/01_create_staging.sql` | Creates the staging table and probe/time index |
+| `sql/02_load_data.sql` | Imports the telemetry data into the staging table |
+| `sql/03_create_clean_view.sql` | Creates the reusable analytical view with data-quality rules and diagnostic flags |
+| `sql/04_qa_summary.sql` | Produces dataset-level and probe-level QA summaries |
+| `docs/investigation_notes.md` | Investigation log and analytical reasoning |
+
+## Pipeline
+
+```text
+PostgreSQL database
+        │
+        ▼
+01_create_staging.sql
+Creates the staging table and index.
+        │
+        ▼
+02_load_data.sql
+Imports dirty_farm_sensors.csv.
+        │
+        ▼
+03_create_clean_view.sql
+Creates the reusable analytical view.
+        │
+        ▼
+04_qa_summary.sql
+Produces dataset-level and probe-level QA summaries.
+```
 
 ## Dataset
 
@@ -138,7 +184,7 @@ This uses SQL window functions including `LAG()` and a running `SUM()` to assign
 
 ## Interpretation
 
-The final clean view successfully identifies three distinct sensor data-quality issues:
+The clean analytical view correctly identifies the three injected telemetry-quality scenarios.
 
 - Probe 101 had 109 rows affected by battery dropout.
 - Probe 102 had 2 physically impossible soil moisture readings.
@@ -162,13 +208,31 @@ This shows that some sensor anomalies cannot be detected from a single row. They
 
 ## How to Run the Project
 
-From inside PostgreSQL/psql, run:
+### 1. Create the staging table
 
-```sql
-\i /path/to/fieldpulse_pipeline.sql
+```bash
+psql -d project_fieldpulse -f sql/01_create_staging.sql
 ```
 
-The script will:
+### 2. Load the telemetry data
+
+```bash
+psql -d project_fieldpulse -f sql/02_load_data.sql
+```
+
+### 3. Create the analytical view
+
+```bash
+psql -d project_fieldpulse -f sql/03_create_clean_view.sql
+```
+
+### 4. Generate QA summaries
+
+```bash
+psql -d project_fieldpulse -f sql/04_qa_summary.sql
+```
+
+Running the SQL files in sequence will:
 
 1. Drop and recreate the staging table
 2. Import the raw CSV
@@ -183,14 +247,6 @@ total_rows | invalid_moisture_rows | battery_dropout_rows | frozen_temp_rows
 1296       | 2                     | 109                  | 73
 ```
 
-## Project Files
-
-| File | Description |
-|---|---|
-| `dirty_farm_sensors.csv` | Simulated dirty farm sensor dataset |
-| `fieldpulse_pipeline.sql` | Reproducible SQL pipeline |
-| `fieldpulse_notes.md` | Detailed data-quality notes and investigation log |
-| `README.md` | Portfolio-facing project overview |
 
 ## Limitations
 
@@ -209,6 +265,4 @@ In a production system, the same principles could be extended using scheduled pi
 
 ## Conclusion
 
-Project FieldPulse demonstrates a practical agritech data-quality workflow using PostgreSQL.
-
-The project preserves raw telemetry, applies explicit cleaning rules, adds diagnostic flags, and produces a reusable clean analytical layer suitable for safer downstream analysis.
+Project FieldPulse demonstrates how PostgreSQL can be used to build a reproducible data-quality pipeline for agricultural sensor telemetry. By preserving raw observations, applying explicit validation rules, and producing a reusable analytical layer, the project reflects a workflow applicable to sensor quality assurance and downstream environmental analysis.
