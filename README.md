@@ -4,7 +4,7 @@
 
 Project FieldPulse is a PostgreSQL-based data-quality pipeline for unreliable farm sensor telemetry.
 
-The project demonstrates a simulated agritech dataset to show how raw IoT-style field readings can be imported, preserved, validated, cleaned, flagged, and summarised into a reusable analytical layer for safer downstream analysis.
+The project uses a simulated agritech dataset to show how raw IoT-style field readings can be imported, preserved, validated, cleaned, flagged, and summarised into a reusable analytical layer for safer downstream analysis.
 
 ## Problem
 
