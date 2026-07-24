@@ -1,4 +1,7 @@
 # Project FieldPulse — Agritech Sensor Data Quality Pipeline
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-blue)
+![Python](https://img.shields.io/badge/Python-3.13-yellow)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 ## Overview
 
@@ -33,7 +36,8 @@ Fieldpulse-agritech-sensor-quality/
 │   └── investigation_notes.md
 ├── outputs/
 │   ├── probe_quality_summary.csv
-│   └── qa_summary.csv
+│   ├── qa_summary.csv
+│   └── sensor_anomalies.png
 ├── scripts/
 │   └── generate_data.py
 └── sql/
@@ -103,11 +107,14 @@ Each probe reports readings every 10 minutes.
 
 ## Tools Used
 
-- PostgreSQL
+- PostgreSQL 18
 - SQL
 - psql
-- CSV import using `\copy`
-- Markdown documentation
+- Python
+- pandas
+- Matplotlib
+- Git
+- GitHub
 
 ## Database Design
 
@@ -120,7 +127,7 @@ The project uses two main database objects:
 
 The raw staging table is preserved as the evidence layer.
 
-The clean view acts as the interpretation layer.
+The clean view provides the analytical layer used for downstream queries.
 
 
 ## Data-Quality Rules
@@ -182,6 +189,18 @@ This uses SQL window functions including `LAG()` and a running `SUM()` to assign
 | 102 | 432 | 2 | 0 | 0 |
 | 103 | 432 | 0 | 0 | 73 |
 
+## Sensor Anomaly Visualisation
+
+The figure below visualises the three simulated telemetry-quality issues represented in the dataset.
+
+- Probe 101 shows battery voltage falling below the operational threshold.
+
+- Probe 102 contains physically impossible soil moisture readings.
+
+- Probe 103 demonstrates a frozen temperature sensor producing repeated identical values.
+
+![FieldPulse Sensor Anomalies](outputs/sensor_anomalies.png)
+
 ## Interpretation
 
 The clean analytical view correctly identifies the three injected telemetry-quality scenarios.
@@ -204,7 +223,21 @@ The strongest part of the project is the frozen-sensor detection.
 
 A single temperature reading of `12.50°C` is not suspicious by itself. However, `12.50°C` repeated continuously for 73 consecutive 10-minute readings is suspicious.
 
-This shows that some sensor anomalies cannot be detected from a single row. They only become visible when values are evaluated in temporal sequence.
+This shows that some sensor anomalies cannot be detected by individual observations alone. They only become visible when readings are evaluated in their temporal sequence.
+
+## Requirements
+
+### Database
+
+- PostgreSQL 18+
+
+### Python
+
+Install the Python dependencies:
+
+```bash
+pip install -r requirements.txt
+```
 
 ## How to Run the Project
 
@@ -250,7 +283,7 @@ total_rows | invalid_moisture_rows | battery_dropout_rows | frozen_temp_rows
 
 ## Limitations
 
-This is a small simulated dataset created for portfolio and learning purposes.
+This is a small simulated dataset created for demonstration and learning purposes.
 
 The project does not include:
 
@@ -265,4 +298,6 @@ In a production system, the same principles could be extended using scheduled pi
 
 ## Conclusion
 
-Project FieldPulse demonstrates how PostgreSQL can be used to build a reproducible data-quality pipeline for agricultural sensor telemetry. By preserving raw observations, applying explicit validation rules, and producing a reusable analytical layer, the project reflects a workflow applicable to sensor quality assurance and downstream environmental analysis.
+FieldPulse implements a PostgreSQL data-quality workflow for agricultural sensor telemetry.
+
+The pipeline preserves raw telemetry, applies validation rules, detects temporal sensor anomalies, and exposes a reusable analytical view for downstream analysis. While the dataset is simulated, the workflow reflects the stages commonly required when preparing sensor telemetry for reliable analysis.
