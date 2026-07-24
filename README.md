@@ -1,7 +1,8 @@
 # Project FieldPulse — Agritech Sensor Data Quality Pipeline
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-blue)
-![Python](https://img.shields.io/badge/Python-3.13-yellow)
-![License](https://img.shields.io/badge/license-MIT-green)
+
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-336791?logo=postgresql&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Overview
 
@@ -57,6 +58,7 @@ Fieldpulse-agritech-sensor-quality/
 | `sql/02_load_data.sql` | Imports the telemetry data into the staging table |
 | `sql/03_create_clean_view.sql` | Creates the reusable analytical view with data-quality rules and diagnostic flags |
 | `sql/04_qa_summary.sql` | Produces dataset-level and probe-level QA summaries |
+| `outputs/sensor_anomalies.png` | Visualises the simulated telemetry anomalies |
 | `docs/investigation_notes.md` | Investigation log and analytical reasoning |
 
 ## Pipeline
@@ -283,7 +285,7 @@ total_rows | invalid_moisture_rows | battery_dropout_rows | frozen_temp_rows
 
 ## Limitations
 
-This is a small simulated dataset created for demonstration and learning purposes.
+This project uses a simulated dataset.
 
 The project does not include:
 
